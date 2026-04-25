@@ -1,4 +1,8 @@
 using Eggonomics.Data;
+using Eggonomics.Interfaces;
+using Eggonomics.Services;
+using Eggonomics.ViewModels;
+using Eggonomics.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -31,6 +35,15 @@ namespace Eggonomics
                 options.UseNpgsql(connectionString));
 
             builder.Services.AddSingleton<DatabaseInitializer>();
+
+            var supabaseUrl = builder.Configuration["SupabaseUrl"]
+                ?? throw new InvalidOperationException("SupabaseUrl not found in user secrets.");
+            var supabaseKey = builder.Configuration["SupabaseKey"]
+                ?? throw new InvalidOperationException("SupabaseKey not found in user secrets.");
+            builder.Services.AddSingleton(new Supabase.Client(supabaseUrl, supabaseKey));
+            builder.Services.AddSingleton<IAuthService, AuthService>();
+            builder.Services.AddTransient<LoginViewModel>();
+            builder.Services.AddTransient<LoginPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

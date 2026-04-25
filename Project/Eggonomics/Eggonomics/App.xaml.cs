@@ -1,17 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Eggonomics.Views;
 
 namespace Eggonomics
 {
     public partial class App : Application
     {
-        public App()
+        private readonly LoginPage _loginPage;
+
+        public App(LoginPage loginPage)
         {
             InitializeComponent();
+            _loginPage = loginPage;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell());
+            return new Window(_loginPage);
         }
     }
 }
