@@ -32,7 +32,7 @@ namespace Eggonomics
                 ?? throw new InvalidOperationException("ConnectionString not found in user secrets.");
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(connectionString));
+                options.UseNpgsql(connectionString), ServiceLifetime.Transient);
 
             builder.Services.AddSingleton<DatabaseInitializer>();
 
@@ -41,9 +41,11 @@ namespace Eggonomics
             var supabaseKey = builder.Configuration["SupabaseKey"]
                 ?? throw new InvalidOperationException("SupabaseKey not found in user secrets.");
             builder.Services.AddSingleton(new Supabase.Client(supabaseUrl, supabaseKey));
-            builder.Services.AddSingleton<IAuthService, AuthService>();
+            builder.Services.AddTransient<IAuthService, AuthService>();
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<LoginPage>();
+            builder.Services.AddTransient<FridgesViewModel>();
+            builder.Services.AddTransient<FridgesPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

@@ -5,18 +5,82 @@
              x:Class="Eggonomics.Views.LoginPage"
              Title="Login">
 
-    <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+    <Grid>
 
-        <Entry Placeholder="Enter your email"
-               Text="{Binding Email}"
-               Keyboard="Email" />
+        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
 
-        <Entry Placeholder="Enter your password"
-               Text="{Binding Password}"
-               IsPassword="True" />
-        <Button Text="Login"
-                Command="{Binding PerformLoginCommand}" />
+            <Entry Placeholder="Enter your email"
+                   Text="{Binding Email}"
+                   Keyboard="Email" />
 
-    </VerticalStackLayout>
+            <Entry Placeholder="Enter your password"
+                   Text="{Binding Password}"
+                   IsPassword="True" />
+
+            <Button Text="Login"
+                    Command="{Binding PerformLoginCommand}" />
+
+            <Label Text="Create Account"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   TextDecorations="Underline">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding OpenSignUpCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+        </VerticalStackLayout>
+
+        <Grid IsVisible="{Binding IsSignUpVisible}">
+
+            <BoxView Color="Black" Opacity="0.9" />
+
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="320"
+                    Padding="24"
+                    StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="16">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Create Account"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="✕"
+                                Command="{Binding CloseSignUpCommand}"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                FontSize="14" />
+                    </Grid>
+
+                    <Entry Placeholder="Email"
+                           Text="{Binding SignUpEmail}"
+                           Keyboard="Email" />
+
+                    <Entry Placeholder="Password"
+                           Text="{Binding SignUpPassword}"
+                           IsPassword="True" />
+
+                    <Entry Placeholder="Confirm password"
+                           Text="{Binding ConfirmPassword}"
+                           IsPassword="True" />
+
+                    <Label Text="{Binding SignUpError}"
+                           TextColor="Red"
+                           IsVisible="{Binding HasSignUpError}"
+                           FontSize="13" />
+
+                    <Button Text="Register"
+                            Command="{Binding PerformRegisterCommand}" />
+
+                </VerticalStackLayout>
+            </Border>
+
+        </Grid>
+
+    </Grid>
 
 </ContentPage>
