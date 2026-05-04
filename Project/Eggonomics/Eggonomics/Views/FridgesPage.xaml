@@ -2,11 +2,11 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Eggonomics.Views.FridgesPage"
-             xmlns:vm="clr-namespace:Eggonomics.ViewModels">
+             xmlns:vm="clr-namespace:Eggonomics.ViewModels"
+             x:Name="ThisPage">
 
     <Grid>
 
-        <!-- Main content -->
         <VerticalStackLayout Padding="16,12" Spacing="12">
 
             <Grid ColumnDefinitions="*,Auto">
@@ -35,8 +35,37 @@
                         <Border Padding="16,12"
                                 Margin="0,4"
                                 StrokeShape="RoundRectangle 8">
-                            <Label Text="{Binding Name}"
-                                   FontSize="16" />
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                                <Label Text="{Binding Fridge.Name}"
+                                       FontSize="16"
+                                       VerticalOptions="Center" />
+                                <Button Grid.Column="1"
+                                        Text="Members"
+                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ViewMembersCommand}"
+                                        CommandParameter="{Binding Fridge}" />
+                                <Button Grid.Column="2"
+                                        Text="Manage"
+                                        IsVisible="{Binding IsOwner}"
+                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.OpenManageCommand}"
+                                        CommandParameter="{Binding Fridge}" />
+                                <Button Grid.Column="3"
+                                        Text="Delete"
+                                        TextColor="White"
+                                        BackgroundColor="Red"
+                                        IsVisible="{Binding IsOwner}"
+                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteFridgeCommand}"
+                                        CommandParameter="{Binding Fridge}" />
+                                <Button Grid.Column="3"
+                                        Text="Leave"
+                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.LeaveFridgeCommand}"
+                                        CommandParameter="{Binding Fridge}">
+                                    <Button.Triggers>
+                                        <DataTrigger TargetType="Button" Binding="{Binding IsOwner}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Button.Triggers>
+                                </Button>
+                            </Grid>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
@@ -44,18 +73,88 @@
 
         </VerticalStackLayout>
 
-        <!-- Create Fridge overlay -->
-        <Grid IsVisible="{Binding IsCreateFridgeVisible}">
-
+        <Grid IsVisible="{Binding IsViewMembersVisible}">
             <BoxView Color="Black" Opacity="0.9" />
-
             <Border HorizontalOptions="Center"
                     VerticalOptions="Center"
                     WidthRequest="320"
                     Padding="24"
                     StrokeShape="RoundRectangle 12">
                 <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding SelectedFridgeName, StringFormat='Members of {0}'}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="✕"
+                                Command="{Binding CloseViewMembersCommand}"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                FontSize="14" />
+                    </Grid>
+                    <CollectionView ItemsSource="{Binding FridgeMembers}">
+                        <CollectionView.EmptyView>
+                            <Label Text="No members yet."
+                                   TextColor="Gray"
+                                   HorizontalOptions="Center" />
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding DisplayName}"
+                                       FontSize="15"
+                                       Padding="0,6" />
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
 
+        <Grid IsVisible="{Binding IsManageVisible}">
+            <BoxView Color="Black" Opacity="0.9" />
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="320"
+                    Padding="24"
+                    StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="16">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="{Binding SelectedFridgeName, StringFormat='Manage {0}'}"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="✕"
+                                Command="{Binding CloseManageCommand}"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                FontSize="14" />
+                    </Grid>
+                    <Label Text="Add member by email" FontSize="14" />
+                    <Entry Placeholder="Email"
+                           Text="{Binding AddMemberEmail}"
+                           Keyboard="Email" />
+                    <Label Text="{Binding ManageError}"
+                           TextColor="Red"
+                           IsVisible="{Binding HasManageError}"
+                           FontSize="13" />
+                    <Button Text="Add Member"
+                            Command="{Binding AddMemberCommand}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid IsVisible="{Binding IsCreateFridgeVisible}">
+            <BoxView Color="Black" Opacity="0.9" />
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="320"
+                    Padding="24"
+                    StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="16">
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Text="Create Fridge"
                                FontSize="18"
@@ -69,16 +168,12 @@
                                 Padding="0"
                                 FontSize="14" />
                     </Grid>
-
                     <Entry Placeholder="Fridge name"
                            Text="{Binding NewFridgeName}" />
-
                     <Button Text="Create"
                             Command="{Binding ConfirmCreateFridgeCommand}" />
-
                 </VerticalStackLayout>
             </Border>
-
         </Grid>
 
     </Grid>

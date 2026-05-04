@@ -18,6 +18,7 @@ public partial class FridgesViewModel : ObservableObject
     private readonly Supabase.Client _supabaseClient;
 
     private User? _currentUser;
+    private Fridge? _managingFridge;
 
     [ObservableProperty]
     private bool isCreateFridgeVisible = false;
@@ -25,7 +26,26 @@ public partial class FridgesViewModel : ObservableObject
     [ObservableProperty]
     private string newFridgeName;
 
-    public ObservableCollection<Fridge> Fridges { get; } = new();
+    [ObservableProperty]
+    private bool isViewMembersVisible = false;
+
+    [ObservableProperty]
+    private string selectedFridgeName;
+
+    [ObservableProperty]
+    private bool isManageVisible = false;
+
+    [ObservableProperty]
+    private string addMemberEmail;
+
+    [ObservableProperty]
+    private string manageError;
+
+    [ObservableProperty]
+    private bool hasManageError;
+
+    public ObservableCollection<FridgeItem> Fridges { get; } = new();
+    public ObservableCollection<User> FridgeMembers { get; } = new();
 
     public FridgesViewModel(IAuthService authService, IServiceProvider serviceProvider, AppDbContext db, Supabase.Client supabaseClient)
     {
@@ -45,12 +65,13 @@ public partial class FridgesViewModel : ObservableObject
         if (_currentUser == null) return;
 
         var fridges = await _db.Fridges
-            .Where(f => f.OwnerId == _currentUser.Id)
+            .Where(f => f.OwnerId == _currentUser.Id ||
+                        f.Members.Any(fu => fu.UserId == _currentUser.Id && fu.IsActive))
             .ToListAsync();
 
         Fridges.Clear();
         foreach (var fridge in fridges)
-            Fridges.Add(fridge);
+            Fridges.Add(new FridgeItem { Fridge = fridge, IsOwner = fridge.OwnerId == _currentUser.Id });
     }
 
     [RelayCommand]
@@ -87,8 +108,122 @@ public partial class FridgesViewModel : ObservableObject
         _db.Fridges.Add(fridge);
         await _db.SaveChangesAsync();
 
-        Fridges.Add(fridge);
+        _db.FridgeUsers.Add(new FridgeUser
+        {
+            FridgeId = fridge.Id,
+            UserId = _currentUser.Id,
+            JoinedAt = DateTime.UtcNow,
+            IsActive = true
+        });
+        await _db.SaveChangesAsync();
+
+        Fridges.Add(new FridgeItem { Fridge = fridge, IsOwner = true });
         NewFridgeName = string.Empty;
         IsCreateFridgeVisible = false;
+    }
+
+    [RelayCommand]
+    public async Task ViewMembers(Fridge fridge)
+    {
+        SelectedFridgeName = fridge.Name;
+
+        var members = await _db.FridgeUsers
+            .Where(fu => fu.FridgeId == fridge.Id && fu.IsActive)
+            .Include(fu => fu.User)
+            .Select(fu => fu.User)
+            .ToListAsync();
+
+        FridgeMembers.Clear();
+        foreach (var member in members)
+            FridgeMembers.Add(member);
+
+        IsViewMembersVisible = true;
+    }
+
+    [RelayCommand]
+    public void CloseViewMembers() => IsViewMembersVisible = false;
+
+    [RelayCommand]
+    public void OpenManage(Fridge fridge)
+    {
+        _managingFridge = fridge;
+        SelectedFridgeName = fridge.Name;
+        AddMemberEmail = string.Empty;
+        ManageError = null;
+        HasManageError = false;
+        IsManageVisible = true;
+    }
+
+    [RelayCommand]
+    public void CloseManage()
+    {
+        _managingFridge = null;
+        AddMemberEmail = string.Empty;
+        ManageError = null;
+        HasManageError = false;
+        IsManageVisible = false;
+    }
+
+    [RelayCommand]
+    public async Task AddMember()
+    {
+        if (string.IsNullOrWhiteSpace(AddMemberEmail) || _managingFridge == null)
+            return;
+
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == AddMemberEmail);
+        if (user == null)
+        {
+            ManageError = "No user found with that email.";
+            HasManageError = true;
+            return;
+        }
+
+        var alreadyMember = await _db.FridgeUsers
+            .AnyAsync(fu => fu.FridgeId == _managingFridge.Id && fu.UserId == user.Id);
+
+        if (alreadyMember)
+        {
+            ManageError = "User is already a member.";
+            HasManageError = true;
+            return;
+        }
+
+        _db.FridgeUsers.Add(new FridgeUser
+        {
+            FridgeId = _managingFridge.Id,
+            UserId = user.Id,
+            JoinedAt = DateTime.UtcNow,
+            IsActive = true
+        });
+        await _db.SaveChangesAsync();
+
+        AddMemberEmail = string.Empty;
+        ManageError = null;
+        HasManageError = false;
+    }
+
+    [RelayCommand]
+    public async Task DeleteFridge(Fridge fridge)
+    {
+        _db.Fridges.Remove(fridge);
+        await _db.SaveChangesAsync();
+
+        var item = Fridges.FirstOrDefault(fi => fi.Fridge.Id == fridge.Id);
+        if (item != null) Fridges.Remove(item);
+    }
+
+    [RelayCommand]
+    public async Task LeaveFridge(Fridge fridge)
+    {
+        var membership = await _db.FridgeUsers
+            .FirstOrDefaultAsync(fu => fu.FridgeId == fridge.Id && fu.UserId == _currentUser!.Id);
+
+        if (membership == null) return;
+
+        _db.FridgeUsers.Remove(membership);
+        await _db.SaveChangesAsync();
+
+        var item = Fridges.FirstOrDefault(fi => fi.Fridge.Id == fridge.Id);
+        if (item != null) Fridges.Remove(item);
     }
 }
