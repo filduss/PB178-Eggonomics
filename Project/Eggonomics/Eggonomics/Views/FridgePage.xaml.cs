@@ -9,4 +9,10 @@ public partial class FridgePage : ContentPage
         InitializeComponent();
         BindingContext = viewModel;
     }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+        (BindingContext as FridgeViewModel)?.LoadTraysCommand.Execute(null);
+    }
 }

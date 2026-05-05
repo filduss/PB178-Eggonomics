@@ -5,9 +5,9 @@
 
     <Grid>
 
-        <VerticalStackLayout Padding="16,12" Spacing="16">
+        <Grid RowDefinitions="Auto,Auto,*" Padding="16,12" RowSpacing="12">
 
-            <Grid ColumnDefinitions="Auto,*">
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
                 <Button Text="← Back"
                         Command="{Binding GoBackCommand}"
                         HorizontalOptions="Start" />
@@ -19,14 +19,50 @@
                        Margin="12,0,0,0" />
             </Grid>
 
-            <Button Text="Insert"
-                    HorizontalOptions="Start"
-                    Command="{Binding InsertCommand}" />
+            <HorizontalStackLayout Grid.Row="1" Spacing="8">
+                <Button Text="Insert"
+                        Command="{Binding InsertCommand}" />
+                <Button Text="+ Add Tray"
+                        Command="{Binding OpenTraySelectCommand}" />
+            </HorizontalStackLayout>
 
-            <Button Text="Select EggTray"
-                    Command="{Binding OpenTraySelectCommand}" />
+            <CollectionView Grid.Row="2" ItemsSource="{Binding EggTrays}">
+                <CollectionView.EmptyView>
+                    <Label Text="No egg trays yet."
+                           TextColor="Gray"
+                           HorizontalOptions="Center"
+                           Margin="0,24" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="16,12"
+                                Margin="0,4"
+                                StrokeShape="RoundRectangle 8">
+                            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,Auto" RowSpacing="4">
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding Name}"
+                                       FontSize="16"
+                                       FontAttributes="Bold" />
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding Origin}"
+                                       FontSize="14"
+                                       HorizontalOptions="End" />
+                                <Label Grid.Row="1" Grid.Column="0"
+                                       Text="{Binding QuantityRemaining, StringFormat='{0} eggs remaining'}"
+                                       FontSize="13"
+                                       TextColor="Gray" />
+                                <Label Grid.Row="1" Grid.Column="1"
+                                       Text="{Binding Price, StringFormat='{0:F2} CZK'}"
+                                       FontSize="13"
+                                       TextColor="Gray"
+                                       HorizontalOptions="End" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-        </VerticalStackLayout>
+        </Grid>
 
         <Grid IsVisible="{Binding IsTraySelectVisible}">
 
@@ -57,29 +93,24 @@
                     <Entry Placeholder="Name" Text="{Binding Name}" />
 
                     <Label Text="Price" FontSize="13" />
-                    <Entry Placeholder="0"
-                           Text="{Binding Price}"
-                           Keyboard="Numeric" />
+                    <Entry Placeholder="0" Text="{Binding Price}" Keyboard="Numeric" />
 
                     <Label Text="Origin" FontSize="13" />
-                    <Picker ItemsSource="{Binding Origins}"
-                            SelectedItem="{Binding Origin}" />
+                    <Picker ItemsSource="{Binding Origins}" SelectedItem="{Binding Origin}" />
 
                     <Label Text="Quantity" FontSize="13" />
-                    <Entry Placeholder="0"
-                           Text="{Binding QuantityAdded}"
-                           Keyboard="Numeric" />
-
-                    <Label Text="{Binding ErrorMessage}"
-                           TextColor="Red"
-                           IsVisible="{Binding HasError}"
-                           FontSize="13" />
+                    <Entry Placeholder="0" Text="{Binding QuantityAdded}" Keyboard="Numeric" />
 
                     <Label Text="Expiration Date" FontSize="13" />
                     <DatePicker Date="{Binding ExpirationDate}" />
 
                     <Label Text="Notes" FontSize="13" />
                     <Entry Placeholder="Notes" Text="{Binding Notes}" />
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="Red"
+                           IsVisible="{Binding HasError}"
+                           FontSize="13" />
 
                     <Button Text="Add tray"
                             Command="{Binding AddTrayCommand}" />

@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Eggonomics.Enums;
@@ -30,6 +31,7 @@ public partial class FridgeViewModel : ObservableObject
     [ObservableProperty] private DateTime expirationDate = DateTime.Today;
 
     public List<Suppliers> Origins { get; } = Enum.GetValues<Suppliers>().ToList();
+    public ObservableCollection<EggTray> EggTrays { get; } = new();
 
     [ObservableProperty] private bool hasError = false;
     [ObservableProperty] private string errorMessage;
@@ -48,6 +50,22 @@ public partial class FridgeViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public async Task LoadTrays()
+    {
+        if (_fridge == null)
+        {
+            return;
+        }
+
+        var trays = await _eggTrayService.GetByFridgeAsync(_fridge.Id);
+        EggTrays.Clear();
+        foreach (var tray in trays)
+        {
+            EggTrays.Add(tray);
+        }
+    }
+
+    [RelayCommand]
     public async Task AddTray()
     {
         if (_fridge == null || string.IsNullOrWhiteSpace(Name) || QuantityAdded <= 0)
@@ -60,7 +78,7 @@ public partial class FridgeViewModel : ObservableObject
         HasError = false;
         ErrorMessage = null;
 
-        await _eggTrayService.InsertAsync(
+        var tray = await _eggTrayService.InsertAsync(
             name: Name,
             price: Price,
             quantityAdded: QuantityAdded,
@@ -70,6 +88,8 @@ public partial class FridgeViewModel : ObservableObject
             fridgeId: _fridge.Id
         );
 
+
+        EggTrays.Insert(0, tray);
         Name = string.Empty;
         Price = 0;
         QuantityAdded = 0;

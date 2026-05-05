@@ -40,4 +40,12 @@ public class EggTrayService : IEggTrayService
 
         return tray;
     }
+
+    public async Task<List<EggTray>> GetByFridgeAsync(int fridgeId)
+    {
+        return await _db.EggTrays
+            .Where(t => t.FridgeId == fridgeId)
+            .OrderByDescending(t => t.AddedAt)
+            .ToListAsync();
+    }
 }
