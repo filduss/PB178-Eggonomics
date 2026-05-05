@@ -46,6 +46,8 @@ namespace Eggonomics
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<FridgesViewModel>();
             builder.Services.AddTransient<FridgesPage>();
+            builder.Services.AddTransient<FridgeViewModel>();
+            builder.Services.AddTransient<FridgePage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

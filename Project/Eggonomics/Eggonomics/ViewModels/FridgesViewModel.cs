@@ -59,10 +59,16 @@ public partial class FridgesViewModel : ObservableObject
     public async Task LoadFridges()
     {
         var email = _supabaseClient.Auth.CurrentUser?.Email;
-        if (email == null) return;
+        if (email == null)
+        {
+            return;
+        }
 
         _currentUser = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
-        if (_currentUser == null) return;
+        if (_currentUser == null)
+        {
+            return;
+        }
 
         var fridges = await _db.Fridges
             .Where(f => f.OwnerId == _currentUser.Id ||
@@ -71,7 +77,20 @@ public partial class FridgesViewModel : ObservableObject
 
         Fridges.Clear();
         foreach (var fridge in fridges)
+        {
             Fridges.Add(new FridgeItem { Fridge = fridge, IsOwner = fridge.OwnerId == _currentUser.Id });
+        }
+    }
+
+    [RelayCommand]
+    public void EnterFridge(Fridge fridge)
+    {
+        var fridgePage = _serviceProvider.GetRequiredService<FridgePage>();
+        if (fridgePage.BindingContext is FridgeViewModel vm)
+        {
+            vm.Initialize(fridge);
+        }
+        Application.Current!.Windows[0].Page = fridgePage;
     }
 
     [RelayCommand]
@@ -96,7 +115,9 @@ public partial class FridgesViewModel : ObservableObject
     public async Task ConfirmCreateFridge()
     {
         if (string.IsNullOrWhiteSpace(NewFridgeName) || _currentUser == null)
+        {
             return;
+        }
 
         var fridge = new Fridge
         {
@@ -135,7 +156,9 @@ public partial class FridgesViewModel : ObservableObject
 
         FridgeMembers.Clear();
         foreach (var member in members)
+        {
             FridgeMembers.Add(member);
+        }
 
         IsViewMembersVisible = true;
     }
@@ -168,7 +191,9 @@ public partial class FridgesViewModel : ObservableObject
     public async Task AddMember()
     {
         if (string.IsNullOrWhiteSpace(AddMemberEmail) || _managingFridge == null)
+        {
             return;
+        }
 
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == AddMemberEmail);
         if (user == null)
@@ -209,7 +234,10 @@ public partial class FridgesViewModel : ObservableObject
         await _db.SaveChangesAsync();
 
         var item = Fridges.FirstOrDefault(fi => fi.Fridge.Id == fridge.Id);
-        if (item != null) Fridges.Remove(item);
+        if (item != null)
+        {
+            Fridges.Remove(item);
+        }
     }
 
     [RelayCommand]
@@ -218,12 +246,19 @@ public partial class FridgesViewModel : ObservableObject
         var membership = await _db.FridgeUsers
             .FirstOrDefaultAsync(fu => fu.FridgeId == fridge.Id && fu.UserId == _currentUser!.Id);
 
-        if (membership == null) return;
+        if (membership == null)
+        {
+            return;
+        }
+
 
         _db.FridgeUsers.Remove(membership);
         await _db.SaveChangesAsync();
 
         var item = Fridges.FirstOrDefault(fi => fi.Fridge.Id == fridge.Id);
-        if (item != null) Fridges.Remove(item);
+        if (item != null)
+        {
+            Fridges.Remove(item);
+        }
     }
 }

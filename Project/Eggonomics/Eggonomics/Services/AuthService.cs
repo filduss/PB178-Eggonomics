@@ -22,7 +22,10 @@ namespace Eggonomics.Services
             try
             {
                 var session = await _supabaseClient.Auth.SignIn(email, password);
-                if (session == null) return false;
+                if (session == null)
+                {
+                    return false;
+                }
 
                 await EnsureUserExistsAsync(email);
                 return true;

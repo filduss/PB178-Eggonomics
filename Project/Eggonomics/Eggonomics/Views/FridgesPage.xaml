@@ -35,27 +35,31 @@
                         <Border Padding="16,12"
                                 Margin="0,4"
                                 StrokeShape="RoundRectangle 8">
-                            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
                                 <Label Text="{Binding Fridge.Name}"
                                        FontSize="16"
                                        VerticalOptions="Center" />
                                 <Button Grid.Column="1"
+                                        Text="Enter"
+                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.EnterFridgeCommand}"
+                                        CommandParameter="{Binding Fridge}" />
+                                <Button Grid.Column="2"
                                         Text="Members"
                                         Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.ViewMembersCommand}"
                                         CommandParameter="{Binding Fridge}" />
-                                <Button Grid.Column="2"
+                                <Button Grid.Column="3"
                                         Text="Manage"
                                         IsVisible="{Binding IsOwner}"
                                         Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.OpenManageCommand}"
                                         CommandParameter="{Binding Fridge}" />
-                                <Button Grid.Column="3"
+                                <Button Grid.Column="4"
                                         Text="Delete"
                                         TextColor="White"
                                         BackgroundColor="Red"
                                         IsVisible="{Binding IsOwner}"
                                         Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteFridgeCommand}"
                                         CommandParameter="{Binding Fridge}" />
-                                <Button Grid.Column="3"
+                                <Button Grid.Column="4"
                                         Text="Leave"
                                         Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.LeaveFridgeCommand}"
                                         CommandParameter="{Binding Fridge}">
