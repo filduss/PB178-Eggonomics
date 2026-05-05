@@ -42,6 +42,8 @@ namespace Eggonomics
                 ?? throw new InvalidOperationException("SupabaseKey not found in user secrets.");
             builder.Services.AddSingleton(new Supabase.Client(supabaseUrl, supabaseKey));
             builder.Services.AddTransient<IAuthService, AuthService>();
+            builder.Services.AddTransient<IEggTrayService, EggTrayService>();
+            builder.Services.AddTransient<IFridgeOperationService, FridgeOperationService>();
             builder.Services.AddTransient<LoginViewModel>();
             builder.Services.AddTransient<LoginPage>();
             builder.Services.AddTransient<FridgesViewModel>();

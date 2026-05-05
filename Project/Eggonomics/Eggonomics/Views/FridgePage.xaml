@@ -3,24 +3,92 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Eggonomics.Views.FridgePage">
 
-    <VerticalStackLayout Padding="16,12" Spacing="16">
+    <Grid>
 
-        <Grid ColumnDefinitions="Auto,*">
-            <Button Text="← Back"
-                    Command="{Binding GoBackCommand}"
-                    HorizontalOptions="Start" />
-            <Label Grid.Column="1"
-                   Text="{Binding FridgeName}"
-                   FontSize="24"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center"
-                   Margin="12,0,0,0" />
+        <VerticalStackLayout Padding="16,12" Spacing="16">
+
+            <Grid ColumnDefinitions="Auto,*">
+                <Button Text="← Back"
+                        Command="{Binding GoBackCommand}"
+                        HorizontalOptions="Start" />
+                <Label Grid.Column="1"
+                       Text="{Binding FridgeName}"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center"
+                       Margin="12,0,0,0" />
+            </Grid>
+
+            <Button Text="Insert"
+                    HorizontalOptions="Start"
+                    Command="{Binding InsertCommand}" />
+
+            <Button Text="Select EggTray"
+                    Command="{Binding OpenTraySelectCommand}" />
+
+        </VerticalStackLayout>
+
+        <Grid IsVisible="{Binding IsTraySelectVisible}">
+
+            <BoxView Color="Black" Opacity="0.9" />
+
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="320"
+                    Padding="24"
+                    StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="16">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Add Egg Tray"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="✕"
+                                Command="{Binding CloseTraySelectCommand}"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                FontSize="14" />
+                    </Grid>
+
+                    <Label Text="Name" FontSize="13" />
+                    <Entry Placeholder="Name" Text="{Binding Name}" />
+
+                    <Label Text="Price" FontSize="13" />
+                    <Entry Placeholder="0"
+                           Text="{Binding Price}"
+                           Keyboard="Numeric" />
+
+                    <Label Text="Origin" FontSize="13" />
+                    <Picker ItemsSource="{Binding Origins}"
+                            SelectedItem="{Binding Origin}" />
+
+                    <Label Text="Quantity" FontSize="13" />
+                    <Entry Placeholder="0"
+                           Text="{Binding QuantityAdded}"
+                           Keyboard="Numeric" />
+
+                    <Label Text="{Binding ErrorMessage}"
+                           TextColor="Red"
+                           IsVisible="{Binding HasError}"
+                           FontSize="13" />
+
+                    <Label Text="Expiration Date" FontSize="13" />
+                    <DatePicker Date="{Binding ExpirationDate}" />
+
+                    <Label Text="Notes" FontSize="13" />
+                    <Entry Placeholder="Notes" Text="{Binding Notes}" />
+
+                    <Button Text="Add tray"
+                            Command="{Binding AddTrayCommand}" />
+
+                </VerticalStackLayout>
+            </Border>
+
         </Grid>
 
-        <Button Text="Insert"
-                HorizontalOptions="Start"
-                Command="{Binding InsertCommand}" />
-
-    </VerticalStackLayout>
+    </Grid>
 
 </ContentPage>
