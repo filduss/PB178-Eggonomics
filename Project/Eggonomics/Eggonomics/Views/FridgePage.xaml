@@ -5,7 +5,7 @@
 
     <Grid>
 
-        <Grid RowDefinitions="Auto,Auto,*" Padding="16,12" RowSpacing="12">
+        <Grid RowDefinitions="Auto,Auto,Auto,*" Padding="16,12" RowSpacing="12">
 
             <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
                 <Button Text="← Back"
@@ -24,9 +24,21 @@
                         Command="{Binding InsertCommand}" />
                 <Button Text="+ Add Tray"
                         Command="{Binding OpenTraySelectCommand}" />
+                <Button Text="Take Eggs"
+                        Command="{Binding OpenTakeEggsCommand}" />
             </HorizontalStackLayout>
 
-            <CollectionView Grid.Row="2" ItemsSource="{Binding EggTrays}">
+            <HorizontalStackLayout Grid.Row="2" Spacing="8" VerticalOptions="Center">
+                <Label Text="Total eggs in fridge:"
+                       FontSize="15"
+                       VerticalOptions="Center" />
+                <Label Text="{Binding TotalEggs}"
+                       FontSize="15"
+                       FontAttributes="Bold"
+                       VerticalOptions="Center" />
+            </HorizontalStackLayout>
+
+            <CollectionView Grid.Row="3" ItemsSource="{Binding EggTrays}">
                 <CollectionView.EmptyView>
                     <Label Text="No egg trays yet."
                            TextColor="Gray"
@@ -114,6 +126,49 @@
 
                     <Button Text="Add tray"
                             Command="{Binding AddTrayCommand}" />
+
+                </VerticalStackLayout>
+            </Border>
+
+        </Grid>
+
+        <Grid IsVisible="{Binding IsTakeEggsVisible}">
+
+            <BoxView Color="Black" Opacity="0.9" />
+
+            <Border HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    WidthRequest="320"
+                    Padding="24"
+                    StrokeShape="RoundRectangle 12">
+                <VerticalStackLayout Spacing="16">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Take Eggs"
+                               FontSize="18"
+                               FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1"
+                                Text="✕"
+                                Command="{Binding CloseTakeEggsCommand}"
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                Padding="0"
+                                FontSize="14" />
+                    </Grid>
+
+                    <Label Text="How many eggs to take?" FontSize="13" />
+                    <Entry Placeholder="0"
+                           Text="{Binding TakeQuantity}"
+                           Keyboard="Numeric" />
+
+                    <Label Text="{Binding TakeErrorMessage}"
+                           TextColor="Red"
+                           IsVisible="{Binding HasTakeError}"
+                           FontSize="13" />
+
+                    <Button Text="Take"
+                            Command="{Binding TakeEggsCommand}" />
 
                 </VerticalStackLayout>
             </Border>

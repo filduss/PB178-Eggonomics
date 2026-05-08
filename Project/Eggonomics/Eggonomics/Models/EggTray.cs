@@ -1,12 +1,16 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Eggonomics.Enums;
 
 namespace Eggonomics.Models
 {
-    public class EggTray
+    public partial class EggTray : ObservableObject
     {
         public int Id { get; set; }
         public int QuantityAdded { get; set; }
-        public int QuantityRemaining { get; set; }
+
+        [ObservableProperty]
+        private int quantityRemaining;
+
         public string Name { get; set; } = string.Empty;
         public Suppliers Origin { get; set; }
         public DateOnly ExpirationDate { get; set; }

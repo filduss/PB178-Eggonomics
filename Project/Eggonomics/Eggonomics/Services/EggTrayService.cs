@@ -48,4 +48,16 @@ public class EggTrayService : IEggTrayService
             .OrderByDescending(t => t.AddedAt)
             .ToListAsync();
     }
+
+    public async Task UpdateAsync(EggTray tray)
+    {
+        _db.EggTrays.Update(tray);
+        await _db.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(EggTray tray)
+    {
+        _db.EggTrays.Remove(tray);
+        await _db.SaveChangesAsync();
+    }
 }

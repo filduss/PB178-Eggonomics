@@ -33,14 +33,26 @@ public partial class FridgeViewModel : ObservableObject
     public List<Suppliers> Origins { get; } = Enum.GetValues<Suppliers>().ToList();
     public ObservableCollection<EggTray> EggTrays { get; } = new();
 
+    public int TotalEggs
+    {
+        get { return EggTrays.Sum(t => t.QuantityRemaining); }
+    }
+
     [ObservableProperty] private bool hasError = false;
     [ObservableProperty] private string errorMessage;
+
+    [ObservableProperty] private bool isTakeEggsVisible = false;
+    [ObservableProperty] private int takeQuantity;
+    [ObservableProperty] private bool hasTakeError = false;
+    [ObservableProperty] private string takeErrorMessage;
 
     public FridgeViewModel(IServiceProvider serviceProvider, IEggTrayService eggTrayService, IFridgeOperationService fridgeOperationService)
     {
         _serviceProvider = serviceProvider;
         _eggTrayService = eggTrayService;
         _fridgeOperationService = fridgeOperationService;
+
+        EggTrays.CollectionChanged += (_, _) => OnPropertyChanged(nameof(TotalEggs));
     }
 
     public void Initialize(Fridge fridge)
@@ -121,5 +133,69 @@ public partial class FridgeViewModel : ObservableObject
     public void Insert()
     {
         // TODO preped 4 operations
+    }
+
+    [RelayCommand]
+    public void OpenTakeEggs()
+    {
+        TakeQuantity = 0;
+        HasTakeError = false;
+        TakeErrorMessage = null;
+        IsTakeEggsVisible = true;
+    }
+
+    [RelayCommand]
+    public void CloseTakeEggs()
+    {
+        IsTakeEggsVisible = false;
+    }
+
+    [RelayCommand]
+    public async Task TakeEggs()
+    {
+        if (TakeQuantity <= 0)
+        {
+            TakeErrorMessage = "Enter a valid amount.";
+            HasTakeError = true;
+            return;
+        }
+
+        int totalAvailable = EggTrays.Sum(t => t.QuantityRemaining);
+        if (TakeQuantity > totalAvailable)
+        {
+            TakeErrorMessage = $"Only {totalAvailable} eggs available.";
+            HasTakeError = true;
+            return;
+        }
+
+        HasTakeError = false;
+        TakeErrorMessage = null;
+
+        var sorted = EggTrays.OrderBy(t => t.ExpirationDate).ToList();
+        int remaining = TakeQuantity;
+
+        foreach (var tray in sorted)
+        {
+            if (remaining <= 0)
+            {
+                break;
+            }
+
+            if (tray.QuantityRemaining <= remaining)
+            {
+                remaining -= tray.QuantityRemaining;
+                tray.QuantityRemaining = 0;
+                await _eggTrayService.DeleteAsync(tray);
+                EggTrays.Remove(tray);
+            }
+            else
+            {
+                tray.QuantityRemaining -= remaining;
+                remaining = 0;
+                await _eggTrayService.UpdateAsync(tray);
+            }
+        }
+
+        IsTakeEggsVisible = false;
     }
 }
