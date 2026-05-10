@@ -167,13 +167,26 @@ public partial class FridgesViewModel : ObservableObject
     public void CloseViewMembers() => IsViewMembersVisible = false;
 
     [RelayCommand]
-    public void OpenManage(Fridge fridge)
+    public async Task OpenManage(Fridge fridge)
     {
         _managingFridge = fridge;
         SelectedFridgeName = fridge.Name;
         AddMemberEmail = string.Empty;
         ManageError = null;
         HasManageError = false;
+
+        var members = await _db.FridgeUsers
+            .Where(fu => fu.FridgeId == fridge.Id && fu.IsActive && fu.UserId != fridge.OwnerId)
+            .Include(fu => fu.User)
+            .Select(fu => fu.User)
+            .ToListAsync();
+
+        FridgeMembers.Clear();
+        foreach (var member in members)
+        {
+            FridgeMembers.Add(member);
+        }
+
         IsManageVisible = true;
     }
 
@@ -222,9 +235,32 @@ public partial class FridgesViewModel : ObservableObject
         });
         await _db.SaveChangesAsync();
 
+        FridgeMembers.Add(user);
         AddMemberEmail = string.Empty;
         ManageError = null;
         HasManageError = false;
+    }
+
+    [RelayCommand]
+    public async Task RemoveMember(User user)
+    {
+        if (_managingFridge == null)
+        {
+            return;
+        }
+
+        var membership = await _db.FridgeUsers
+            .FirstOrDefaultAsync(fu => fu.FridgeId == _managingFridge.Id && fu.UserId == user.Id);
+
+        if (membership == null)
+        {
+            return;
+        }
+
+        _db.FridgeUsers.Remove(membership);
+        await _db.SaveChangesAsync();
+
+        FridgeMembers.Remove(user);
     }
 
     [RelayCommand]
