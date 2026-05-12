@@ -10,11 +10,22 @@ public partial class FridgePage : ContentPage
         BindingContext = viewModel;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
         var vm = BindingContext as FridgeViewModel;
-        vm?.LoadTraysCommand.Execute(null);
-        vm?.LoadOperationsCommand.Execute(null);
+        if (vm == null)
+        {
+            return;
+        }
+
+        int expired = await vm.CheckExpiredTraysAsync();
+        await vm.LoadTrays();
+        await vm.LoadOperations();
+
+        if (expired > 0)
+        {
+            await DisplayAlert("Eggs Expired", $"{expired} egg{(expired == 1 ? "" : "s")} were removed from expired trays.", "OK");
+        }
     }
 }

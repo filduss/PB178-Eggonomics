@@ -62,6 +62,15 @@ public partial class FridgeViewModel : ObservableObject
         FridgeName = fridge.Name;
     }
 
+    public async Task<int> CheckExpiredTraysAsync()
+    {
+        if (_fridge == null)
+        {
+            return 0;
+        }
+        return await _fridgeOperationService.ProcessExpiredTraysAsync(_fridge.Id);
+    }
+
     [RelayCommand]
     public async Task LoadTrays()
     {
@@ -127,7 +136,7 @@ public partial class FridgeViewModel : ObservableObject
         ExpirationDate = DateTime.Today;
         IsTraySelectVisible = false;
 
-        await _fridgeOperationService.RecordAsync(OperationType.Insert, _fridge.Id, qty);
+        await _fridgeOperationService.RecordAsync(OperationType.Insert, _fridge.Id, qty, tray.Price);
         await LoadOperations();
     }
 
@@ -189,6 +198,7 @@ public partial class FridgeViewModel : ObservableObject
         int qty = TakeQuantity;
         var sorted = EggTrays.OrderBy(t => t.ExpirationDate).ToList();
         int remaining = qty;
+        var batchItems = new List<(int trayId, int quantity, decimal pricePerEgg)>();
 
         foreach (var tray in sorted)
         {
@@ -196,24 +206,30 @@ public partial class FridgeViewModel : ObservableObject
             {
                 break;
             }
+            int take = Math.Min(tray.QuantityRemaining, remaining);
+            batchItems.Add((tray.Id, take, tray.PricePerEgg));
+            remaining -= take;
+        }
 
-            if (tray.QuantityRemaining <= remaining)
+        await _fridgeOperationService.RecordTakeAsync(_fridge!.Id, batchItems);
+
+        foreach (var (trayId, take, _) in batchItems)
+        {
+            var tray = EggTrays.First(t => t.Id == trayId);
+            if (tray.QuantityRemaining <= take)
             {
-                remaining -= tray.QuantityRemaining;
                 tray.QuantityRemaining = 0;
                 await _eggTrayService.DeleteAsync(tray);
                 EggTrays.Remove(tray);
             }
             else
             {
-                tray.QuantityRemaining -= remaining;
-                remaining = 0;
+                tray.QuantityRemaining -= take;
                 await _eggTrayService.UpdateAsync(tray);
             }
         }
 
         OnPropertyChanged(nameof(TotalEggs));
-        await _fridgeOperationService.RecordAsync(OperationType.Withdraw, _fridge.Id, qty);
         await LoadOperations();
         IsTakeEggsVisible = false;
     }

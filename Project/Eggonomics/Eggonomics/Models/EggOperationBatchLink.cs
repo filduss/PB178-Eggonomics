@@ -5,8 +5,8 @@ namespace Eggonomics.Models
         public int Id { get; set; }
         public int EggOperationId { get; set; }
         public EggOperation EggOperation { get; set; } = null!;
-        public int EggTrayId { get; set; }
-        public EggTray EggTray { get; set; } = null!;
+        public int? EggTrayId { get; set; }
+        public EggTray? EggTray { get; set; }
         public int QuantityTaken { get; set; }
 
         public EggOperationBatchLink() { }

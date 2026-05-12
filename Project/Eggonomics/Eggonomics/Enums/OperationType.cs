@@ -7,6 +7,7 @@ namespace Eggonomics.Enums
     public enum OperationType
     {
         Insert,
-        Withdraw
+        Withdraw,
+        Expire
     }
 }

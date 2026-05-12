@@ -11,19 +11,25 @@ namespace Eggonomics.Models
         public int FridgeUserId { get; set; }
         public FridgeUser FridgeUser { get; set; } = null!;
         public int TotalQuantity { get; set; }
+        public decimal MonetaryValue { get; set; }
         public DateTime PerformedAt { get; set; }
         public DateTime? EditedAt { get; set; }
         public int? EditedByUserId { get; set; }
         public User? EditedBy { get; set; }
         public string? Notes { get; set; }
 
-        public string TypeLabel => Type == OperationType.Insert ? "gave" : "took";
+        public string TypeLabel => Type switch
+        {
+            OperationType.Insert => "gave",
+            OperationType.Withdraw => "took",
+            OperationType.Expire => "expired",
+        };
 
         public List<EggOperationBatchLink> BatchLinks { get; set; } = [];
 
         public EggOperation() { }
 
-        public EggOperation(OperationType type, Fridge fridge, FridgeUser fridgeUser, int totalQuantity, string? notes = null)
+        public EggOperation(OperationType type, Fridge fridge, FridgeUser fridgeUser, int totalQuantity, decimal monetaryValue = 0, string? notes = null)
         {
             Type = type;
             Fridge = fridge;
@@ -31,6 +37,7 @@ namespace Eggonomics.Models
             FridgeUser = fridgeUser;
             FridgeUserId = fridgeUser.Id;
             TotalQuantity = totalQuantity;
+            MonetaryValue = monetaryValue;
             PerformedAt = DateTime.UtcNow;
             Notes = notes;
         }

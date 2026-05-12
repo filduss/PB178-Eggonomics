@@ -61,7 +61,7 @@ namespace Eggonomics.Data
                 .HasOne(eo => eo.Fridge)
                 .WithMany()
                 .HasForeignKey(eo => eo.FridgeId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // EggOperation → FridgeUser
             modelBuilder.Entity<EggOperation>()
@@ -84,19 +84,19 @@ namespace Eggonomics.Data
                 .HasForeignKey(link => link.EggOperationId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // EggOperationBatchLink → EggTray
+            // EggOperationBatchLink → EggTray (nullable — tray may be deleted after link is written)
             modelBuilder.Entity<EggOperationBatchLink>()
                 .HasOne(link => link.EggTray)
                 .WithMany()
                 .HasForeignKey(link => link.EggTrayId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.SetNull);
 
             // DebtSettlement → Fridge
             modelBuilder.Entity<DebtSettlement>()
                 .HasOne(ds => ds.Fridge)
                 .WithMany()
                 .HasForeignKey(ds => ds.FridgeId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             // DebtSettlement → Payer / Receiver (two FKs to User)
             modelBuilder.Entity<DebtSettlement>()
@@ -122,6 +122,10 @@ namespace Eggonomics.Data
 
             modelBuilder.Entity<DebtSettlement>()
                 .Property(ds => ds.Amount)
+                .HasColumnType("numeric(10,2)");
+
+            modelBuilder.Entity<EggOperation>()
+                .Property(eo => eo.MonetaryValue)
                 .HasColumnType("numeric(10,2)");
         }
     }
