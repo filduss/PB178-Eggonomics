@@ -32,6 +32,7 @@ public partial class FridgeViewModel : ObservableObject
 
     public List<Suppliers> Origins { get; } = Enum.GetValues<Suppliers>().ToList();
     public ObservableCollection<EggTray> EggTrays { get; } = new();
+    public ObservableCollection<EggOperation> Operations { get; } = new();
 
     public int TotalEggs
     {
@@ -78,6 +79,22 @@ public partial class FridgeViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public async Task LoadOperations()
+    {
+        if (_fridge == null)
+        {
+            return;
+        }
+
+        var ops = await _fridgeOperationService.GetByFridgeAsync(_fridge.Id);
+        Operations.Clear();
+        foreach (var op in ops)
+        {
+            Operations.Add(op);
+        }
+    }
+
+    [RelayCommand]
     public async Task AddTray()
     {
         if (_fridge == null || string.IsNullOrWhiteSpace(Name) || QuantityAdded <= 0)
@@ -90,16 +107,17 @@ public partial class FridgeViewModel : ObservableObject
         HasError = false;
         ErrorMessage = null;
 
+        int qty = QuantityAdded;
+
         var tray = await _eggTrayService.InsertAsync(
             name: Name,
             price: Price,
-            quantityAdded: QuantityAdded,
+            quantityAdded: qty,
             origin: Origin,
             expirationDate: DateOnly.FromDateTime(ExpirationDate),
             notes: Notes,
             fridgeId: _fridge.Id
         );
-
 
         EggTrays.Insert(0, tray);
         Name = string.Empty;
@@ -108,6 +126,9 @@ public partial class FridgeViewModel : ObservableObject
         Notes = string.Empty;
         ExpirationDate = DateTime.Today;
         IsTraySelectVisible = false;
+
+        await _fridgeOperationService.RecordAsync(OperationType.Insert, _fridge.Id, qty);
+        await LoadOperations();
     }
 
     [RelayCommand]
@@ -127,12 +148,6 @@ public partial class FridgeViewModel : ObservableObject
     {
         var fridgesPage = _serviceProvider.GetRequiredService<FridgesPage>();
         Application.Current!.Windows[0].Page = fridgesPage;
-    }
-
-    [RelayCommand]
-    public void Insert()
-    {
-        // TODO preped 4 operations
     }
 
     [RelayCommand]
@@ -171,8 +186,9 @@ public partial class FridgeViewModel : ObservableObject
         HasTakeError = false;
         TakeErrorMessage = null;
 
+        int qty = TakeQuantity;
         var sorted = EggTrays.OrderBy(t => t.ExpirationDate).ToList();
-        int remaining = TakeQuantity;
+        int remaining = qty;
 
         foreach (var tray in sorted)
         {
@@ -196,6 +212,9 @@ public partial class FridgeViewModel : ObservableObject
             }
         }
 
+        OnPropertyChanged(nameof(TotalEggs));
+        await _fridgeOperationService.RecordAsync(OperationType.Withdraw, _fridge.Id, qty);
+        await LoadOperations();
         IsTakeEggsVisible = false;
     }
 }

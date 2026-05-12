@@ -13,6 +13,8 @@ public partial class FridgePage : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        (BindingContext as FridgeViewModel)?.LoadTraysCommand.Execute(null);
+        var vm = BindingContext as FridgeViewModel;
+        vm?.LoadTraysCommand.Execute(null);
+        vm?.LoadOperationsCommand.Execute(null);
     }
 }

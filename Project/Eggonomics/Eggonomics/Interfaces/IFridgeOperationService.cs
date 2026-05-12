@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Eggonomics.Enums;
+using Eggonomics.Models;
 
 namespace Eggonomics.Interfaces
 {
     public interface IFridgeOperationService
     {
-        public Task InsertEggsAsync();
+        Task RecordAsync(OperationType type, int fridgeId, int quantity);
+        Task<List<EggOperation>> GetByFridgeAsync(int fridgeId);
     }
 }

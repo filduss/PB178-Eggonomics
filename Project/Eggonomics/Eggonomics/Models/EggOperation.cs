@@ -17,6 +17,8 @@ namespace Eggonomics.Models
         public User? EditedBy { get; set; }
         public string? Notes { get; set; }
 
+        public string TypeLabel => Type == OperationType.Insert ? "gave" : "took";
+
         public List<EggOperationBatchLink> BatchLinks { get; set; } = [];
 
         public EggOperation() { }
