@@ -100,5 +100,28 @@ namespace Eggonomics.Services
                 .OrderByDescending(o => o.PerformedAt)
                 .ToListAsync();
         }
+
+        public async Task<List<UserFridgeStats>> GetUserStatsAsync(int fridgeId)
+        {
+            var operations = await _db.EggOperations
+                .Where(o => o.FridgeId == fridgeId)
+                .Include(o => o.FridgeUser)
+                    .ThenInclude(fu => fu.User)
+                .ToListAsync();
+
+            return operations
+                .GroupBy(o => o.FridgeUser.User.DisplayName)
+                .Select(g => new UserFridgeStats
+                {
+                    DisplayName  = g.Key,
+                    EggsGiven    = g.Where(o => o.Type == OperationType.Insert).Sum(o => o.TotalQuantity),
+                    EggsTaken    = g.Where(o => o.Type == OperationType.Withdraw).Sum(o => o.TotalQuantity),
+                    EggsExpired  = g.Where(o => o.Type == OperationType.Expire).Sum(o => o.TotalQuantity),
+                    ValueGiven   = g.Where(o => o.Type == OperationType.Insert).Sum(o => o.MonetaryValue),
+                    ValueTaken   = g.Where(o => o.Type == OperationType.Withdraw).Sum(o => o.MonetaryValue),
+                    ValueExpired = g.Where(o => o.Type == OperationType.Expire).Sum(o => o.MonetaryValue),
+                })
+                .ToList();
+        }
     }
 }

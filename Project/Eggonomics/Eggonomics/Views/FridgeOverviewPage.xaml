@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Eggonomics.Views.FridgeOverviewPage">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12" RowSpacing="12">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
+            <Button Text="← Back"
+                    Command="{Binding GoBackCommand}"
+                    HorizontalOptions="Start" />
+            <Label Grid.Column="1"
+                   Text="{Binding FridgeName}"
+                   FontSize="24"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center"
+                   Margin="12,0,0,0" />
+        </Grid>
+
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+            <Label Text="Member Statistics"
+                   FontSize="16"
+                   FontAttributes="Bold"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Text="{Binding SortLabel}"
+                    Command="{Binding ToggleSortCommand}" />
+        </Grid>
+
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Members}">
+            <CollectionView.EmptyView>
+                <Label Text="No activity yet."
+                       TextColor="Gray"
+                       HorizontalOptions="Center"
+                       Margin="0,24" />
+            </CollectionView.EmptyView>
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Padding="16,12"
+                            Margin="0,4"
+                            StrokeShape="RoundRectangle 8">
+                        <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+
+                            <Label Grid.Row="0"
+                                   Text="{Binding DisplayName}"
+                                   FontSize="16"
+                                   FontAttributes="Bold" />
+
+                            <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+
+                                <HorizontalStackLayout Spacing="16" VerticalOptions="Center">
+                                    <VerticalStackLayout Spacing="1">
+                                        <Label Text="{Binding EggsGiven, StringFormat='Given: {0}'}"
+                                               FontSize="12"
+                                               TextColor="Green" />
+                                        <Label Text="{Binding ValueGiven, StringFormat='+{0:F2} CZK'}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="Green" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Spacing="1">
+                                        <Label Text="{Binding EggsTaken, StringFormat='Taken: {0}'}"
+                                               FontSize="12"
+                                               TextColor="Red" />
+                                        <Label Text="{Binding ValueTaken, StringFormat='-{0:F2} CZK'}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="Red" />
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Spacing="1">
+                                        <Label Text="{Binding EggsExpired, StringFormat='Expired: {0}'}"
+                                               FontSize="12"
+                                               TextColor="Orange" />
+                                        <Label Text="{Binding ValueExpired, StringFormat='-{0:F2} CZK'}"
+                                               FontSize="12"
+                                               FontAttributes="Bold"
+                                               TextColor="Orange" />
+                                    </VerticalStackLayout>
+                                </HorizontalStackLayout>
+
+                                <Label Grid.Column="1"
+                                       Text="{Binding NetValue, StringFormat='{0:F2} CZK'}"
+                                       FontSize="20"
+                                       FontAttributes="Bold"
+                                       TextColor="{Binding NetValueColor}"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="End" />
+
+                            </Grid>
+
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>

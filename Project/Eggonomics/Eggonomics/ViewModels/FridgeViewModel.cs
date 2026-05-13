@@ -160,6 +160,17 @@ public partial class FridgeViewModel : ObservableObject
     }
 
     [RelayCommand]
+    public void GoToOverview()
+    {
+        var overviewPage = _serviceProvider.GetRequiredService<FridgeOverviewPage>();
+        if (overviewPage.BindingContext is FridgeOverviewViewModel vm && _fridge != null)
+        {
+            vm.Initialize(_fridge);
+        }
+        Application.Current!.Windows[0].Page = overviewPage;
+    }
+
+    [RelayCommand]
     public void OpenTakeEggs()
     {
         TakeQuantity = 0;

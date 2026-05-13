@@ -24,6 +24,8 @@
                         Command="{Binding OpenTraySelectCommand}" />
                 <Button Text="Take Eggs"
                         Command="{Binding OpenTakeEggsCommand}" />
+                <Button Text="Overview"
+                        Command="{Binding GoToOverviewCommand}" />
             </HorizontalStackLayout>
 
             <Grid Grid.Row="2" ColumnDefinitions="*,*" ColumnSpacing="16">
