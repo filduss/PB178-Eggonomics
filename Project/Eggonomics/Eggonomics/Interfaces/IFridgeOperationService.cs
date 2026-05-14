@@ -10,5 +10,7 @@ namespace Eggonomics.Interfaces
         Task<int> ProcessExpiredTraysAsync(int fridgeId);
         Task<List<EggOperation>> GetByFridgeAsync(int fridgeId);
         Task<List<UserFridgeStats>> GetUserStatsAsync(int fridgeId);
+        Task<List<DebtResult>> CalculateDebtsAsync(int fridgeId);
+        Task SettleDebtsAsync(int fridgeId);
     }
 }

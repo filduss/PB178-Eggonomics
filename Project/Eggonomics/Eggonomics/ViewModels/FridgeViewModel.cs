@@ -160,12 +160,12 @@ public partial class FridgeViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public void GoToOverview()
+    public async Task GoToOverview()
     {
         var overviewPage = _serviceProvider.GetRequiredService<FridgeOverviewPage>();
         if (overviewPage.BindingContext is FridgeOverviewViewModel vm && _fridge != null)
         {
-            vm.Initialize(_fridge);
+            await vm.Initialize(_fridge);
         }
         Application.Current!.Windows[0].Page = overviewPage;
     }
