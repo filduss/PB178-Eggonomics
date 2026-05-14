@@ -200,23 +200,33 @@ public partial class FridgesViewModel : ObservableObject
             return;
         }
 
-        var alreadyMember = await _db.FridgeUsers
-            .AnyAsync(fu => fu.FridgeId == _managingFridge.Id && fu.UserId == user.Id);
+        var existing = await _db.FridgeUsers
+            .FirstOrDefaultAsync(fu => fu.FridgeId == _managingFridge.Id && fu.UserId == user.Id);
 
-        if (alreadyMember)
+        if (existing != null)
         {
-            ManageError = "User is already a member.";
-            HasManageError = true;
-            return;
+            if (existing.IsActive)
+            {
+                ManageError = "User is already a member.";
+                HasManageError = true;
+                return;
+            }
+
+            // Re-activate a previously removed member instead of inserting a duplicate row.
+            existing.IsActive = true;
+            existing.JoinedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            _db.FridgeUsers.Add(new FridgeUser
+            {
+                FridgeId = _managingFridge.Id,
+                UserId = user.Id,
+                JoinedAt = DateTime.UtcNow,
+                IsActive = true
+            });
         }
 
-        _db.FridgeUsers.Add(new FridgeUser
-        {
-            FridgeId = _managingFridge.Id,
-            UserId = user.Id,
-            JoinedAt = DateTime.UtcNow,
-            IsActive = true
-        });
         await _db.SaveChangesAsync();
 
         FridgeMembers.Add(user);
@@ -241,7 +251,8 @@ public partial class FridgesViewModel : ObservableObject
             return;
         }
 
-        _db.FridgeUsers.Remove(membership);
+        // Soft-delete to preserve EggOperation history that references this FridgeUser row.
+        membership.IsActive = false;
         await _db.SaveChangesAsync();
 
         FridgeMembers.Remove(user);
@@ -250,6 +261,19 @@ public partial class FridgesViewModel : ObservableObject
     [RelayCommand]
     public async Task DeleteFridge(Fridge fridge)
     {
+        // Delete in FK dependency order: operations → debt settlements → trays → members → fridge
+        var operations = await _db.EggOperations.Where(o => o.FridgeId == fridge.Id).ToListAsync();
+        _db.EggOperations.RemoveRange(operations);
+
+        var settlements = await _db.DebtSettlements.Where(d => d.FridgeId == fridge.Id).ToListAsync();
+        _db.DebtSettlements.RemoveRange(settlements);
+
+        var trays = await _db.EggTrays.Where(t => t.FridgeId == fridge.Id).ToListAsync();
+        _db.EggTrays.RemoveRange(trays);
+
+        var members = await _db.FridgeUsers.Where(fu => fu.FridgeId == fridge.Id).ToListAsync();
+        _db.FridgeUsers.RemoveRange(members);
+
         _db.Fridges.Remove(fridge);
         await _db.SaveChangesAsync();
 
@@ -260,24 +284,5 @@ public partial class FridgesViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    public async Task LeaveFridge(Fridge fridge)
-    {
-        var membership = await _db.FridgeUsers
-            .FirstOrDefaultAsync(fu => fu.FridgeId == fridge.Id && fu.UserId == _currentUser!.Id);
 
-        if (membership == null)
-        {
-            return;
-        }
-
-        _db.FridgeUsers.Remove(membership);
-        await _db.SaveChangesAsync();
-
-        var item = Fridges.FirstOrDefault(fi => fi.Fridge.Id == fridge.Id);
-        if (item != null)
-        {
-            Fridges.Remove(item);
-        }
-    }
 }

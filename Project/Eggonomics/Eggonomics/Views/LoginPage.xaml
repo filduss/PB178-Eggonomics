@@ -7,73 +7,113 @@
 
     <Grid>
 
-        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+        <ScrollView>
+            <VerticalStackLayout Spacing="0" Padding="32" VerticalOptions="Center"
+                                 MaximumWidthRequest="420" HorizontalOptions="Center">
 
-            <Entry Placeholder="Enter your email"
-                   Text="{Binding Email}"
-                   Keyboard="Email" />
+                <!-- Branding -->
+                <Label Text="🥚"
+                       FontSize="72"
+                       HorizontalOptions="Center"
+                       Margin="0,48,0,8" />
 
-            <Entry Placeholder="Enter your password"
-                   Text="{Binding Password}"
-                   IsPassword="True" />
+                <Label Text="Eggonomics"
+                       FontSize="34"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryLight}}" />
 
-            <Button Text="Login"
-                    Command="{Binding PerformLoginCommand}" />
+                <Label Text="Track your fridge, share your eggs"
+                       FontSize="14"
+                       HorizontalOptions="Center"
+                       Margin="0,6,0,40"
+                       TextColor="{AppThemeBinding Light={StaticResource Gray500}, Dark={StaticResource Gray400}}" />
 
-            <Label Text="Create Account"
-                   TextColor="White"
-                   HorizontalOptions="Center"
-                   TextDecorations="Underline">
-                <Label.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding OpenSignUpCommand}" />
-                </Label.GestureRecognizers>
-            </Label>
+                <!-- Email -->
+                <Border Style="{StaticResource InputBorderStyle}"
+                        Margin="0,0,0,12">
+                    <Entry Placeholder="Email address"
+                           Text="{Binding Email}"
+                           Keyboard="Email" />
+                </Border>
 
-        </VerticalStackLayout>
+                <!-- Password -->
+                <Border Style="{StaticResource InputBorderStyle}"
+                        Margin="0,0,0,24">
+                    <Entry Placeholder="Password"
+                           Text="{Binding Password}"
+                           IsPassword="True" />
+                </Border>
 
+                <Button Text="Log In"
+                        Command="{Binding PerformLoginCommand}" />
+
+                <Label Text="Don't have an account? Create one"
+                       HorizontalOptions="Center"
+                       Margin="0,20,0,48"
+                       TextColor="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource PrimaryLight}}"
+                       TextDecorations="Underline">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding OpenSignUpCommand}" />
+                    </Label.GestureRecognizers>
+                </Label>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Sign-up overlay -->
         <Grid IsVisible="{Binding IsSignUpVisible}">
 
-            <BoxView Color="Black" Opacity="0.9" />
+            <BoxView Color="Black" Opacity="0.7" />
 
             <Border HorizontalOptions="Center"
                     VerticalOptions="Center"
-                    WidthRequest="320"
+                    WidthRequest="340"
                     Padding="24"
-                    StrokeShape="RoundRectangle 12">
-                <VerticalStackLayout Spacing="16">
+                    Style="{StaticResource CardStyle}">
+                <VerticalStackLayout Spacing="14">
 
                     <Grid ColumnDefinitions="*,Auto">
                         <Label Text="Create Account"
-                               FontSize="18"
-                               FontAttributes="Bold"
-                               VerticalOptions="Center" />
+                               Style="{StaticResource ModalTitleStyle}" />
                         <Button Grid.Column="1"
                                 Text="✕"
+                                Style="{StaticResource OutlineButtonStyle}"
                                 Command="{Binding CloseSignUpCommand}"
-                                WidthRequest="36"
-                                HeightRequest="36"
+                                WidthRequest="40"
+                                HeightRequest="40"
                                 Padding="0"
                                 FontSize="14" />
                     </Grid>
 
-                    <Entry Placeholder="Email"
-                           Text="{Binding SignUpEmail}"
-                           Keyboard="Email" />
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <Entry Placeholder="Display name"
+                               Text="{Binding SignUpDisplayName}" />
+                    </Border>
 
-                    <Entry Placeholder="Password"
-                           Text="{Binding SignUpPassword}"
-                           IsPassword="True" />
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <Entry Placeholder="Email"
+                               Text="{Binding SignUpEmail}"
+                               Keyboard="Email" />
+                    </Border>
 
-                    <Entry Placeholder="Confirm password"
-                           Text="{Binding ConfirmPassword}"
-                           IsPassword="True" />
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <Entry Placeholder="Password (min. 8 characters)"
+                               Text="{Binding SignUpPassword}"
+                               IsPassword="True" />
+                    </Border>
+
+                    <Border Style="{StaticResource InputBorderStyle}">
+                        <Entry Placeholder="Confirm password"
+                               Text="{Binding ConfirmPassword}"
+                               IsPassword="True" />
+                    </Border>
 
                     <Label Text="{Binding SignUpError}"
-                           TextColor="Red"
-                           IsVisible="{Binding HasSignUpError}"
-                           FontSize="13" />
+                           Style="{StaticResource ErrorLabelStyle}"
+                           IsVisible="{Binding HasSignUpError}" />
 
-                    <Button Text="Register"
+                    <Button Text="Create Account"
                             Command="{Binding PerformRegisterCommand}" />
 
                 </VerticalStackLayout>

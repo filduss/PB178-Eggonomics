@@ -25,7 +25,7 @@ public partial class FridgePage : ContentPage
 
         if (expired > 0)
         {
-            await DisplayAlert("Eggs Expired", $"{expired} egg{(expired == 1 ? "" : "s")} were removed from expired trays.", "OK");
+            await DisplayAlertAsync("Eggs Expired", $"{expired} egg{(expired == 1 ? "" : "s")} were removed from expired trays.", "OK");
         }
     }
 }

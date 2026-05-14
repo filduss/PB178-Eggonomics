@@ -77,6 +77,8 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
 		<PackageReference Include="supabase-csharp" Version="0.16.2" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.1.2" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.1.2" />
 	</ItemGroup>
 
 </Project>

@@ -42,18 +42,18 @@ namespace Eggonomics.Services
             }
         }
 
-        public async Task<bool> CreateAccountAsync(string email, string password)
+        public async Task<string?> CreateAccountAsync(string email, string password, string displayName)
         {
             try
             {
                 await _supabaseClient.Auth.SignUp(email, password);
-                await EnsureUserExistsAsync(email);
-                return true;
+                await EnsureUserExistsAsync(email, displayName);
+                return null;
             }
             catch (Exception e)
             {
                 Debug.WriteLine($"Registration failed: {e.Message}");
-                return false;
+                return e.Message;
             }
         }
 
@@ -69,7 +69,7 @@ namespace Eggonomics.Services
             }
         }
 
-        private async Task EnsureUserExistsAsync(string email)
+        private async Task EnsureUserExistsAsync(string email, string? displayName = null)
         {
             var exists = await _db.Users.AnyAsync(u => u.Email == email);
             if (!exists)
@@ -79,7 +79,7 @@ namespace Eggonomics.Services
                 {
                     Email = email,
                     Username = username,
-                    DisplayName = username,
+                    DisplayName = string.IsNullOrWhiteSpace(displayName) ? username : displayName,
                     PasswordHash = string.Empty,
                     CreatedAt = DateTime.UtcNow
                 });

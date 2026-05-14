@@ -3,124 +3,140 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Eggonomics.Views.FridgeOverviewPage">
 
-    <Grid RowDefinitions="Auto,Auto,*" Padding="16,12" RowSpacing="12">
+    <Grid>
 
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
-            <Button Text="← Back"
-                    Command="{Binding GoBackCommand}"
-                    HorizontalOptions="Start" />
-            <Label Grid.Column="1"
-                   Text="{Binding FridgeName}"
-                   FontSize="24"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center"
-                   Margin="12,0,0,0" />
-        </Grid>
+        <Grid RowDefinitions="Auto,Auto,*" Padding="20,16" RowSpacing="14">
 
-        <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-            <Label Text="Member Statistics"
-                   FontSize="16"
-                   FontAttributes="Bold"
-                   VerticalOptions="Center" />
-            <Button Grid.Column="1"
-                    Text="{Binding SortLabel}"
-                    Command="{Binding ToggleSortCommand}" />
-            <Button Grid.Column="2"
-                    Text="Calculate Debts"
-                    Command="{Binding CalculateDebtsCommand}" />
-        </Grid>
+            <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
+                <Button Text="← Back"
+                        Style="{StaticResource OutlineButtonStyle}"
+                        Command="{Binding GoBackCommand}"
+                        HorizontalOptions="Start" />
+                <Label Grid.Column="1"
+                       Text="{Binding FridgeName}"
+                       Style="{StaticResource PageTitleStyle}"
+                       Margin="12,0,0,0" />
+            </Grid>
 
-        <CollectionView Grid.Row="2" ItemsSource="{Binding Members}">
-            <CollectionView.EmptyView>
-                <Label Text="No activity yet."
-                       TextColor="Gray"
-                       HorizontalOptions="Center"
-                       Margin="0,24" />
-            </CollectionView.EmptyView>
-            <CollectionView.ItemTemplate>
-                <DataTemplate>
-                    <Border Padding="16,12"
-                            Margin="0,4"
-                            StrokeShape="RoundRectangle 8">
-                        <Grid RowDefinitions="Auto,Auto" RowSpacing="8">
+            <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                <Label Text="Member Statistics"
+                       Style="{StaticResource SectionTitleStyle}" />
+                <Button Grid.Column="1"
+                        Text="{Binding SortLabel}"
+                        Style="{StaticResource OutlineButtonStyle}"
+                        Command="{Binding ToggleSortCommand}" />
+                <Button Grid.Column="2"
+                        Text="Calculate Debts"
+                        Command="{Binding CalculateDebtsCommand}" />
+            </Grid>
 
-                            <Label Grid.Row="0"
-                                   Text="{Binding DisplayName}"
-                                   FontSize="16"
-                                   FontAttributes="Bold" />
+            <CollectionView Grid.Row="2" ItemsSource="{Binding Members}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Spacing="6" HorizontalOptions="Center" Margin="0,32">
+                        <Label Text="📊" FontSize="40" HorizontalOptions="Center" />
+                        <Label Text="No activity yet."
+                               Style="{StaticResource MutedLabelStyle}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Margin="0,5"
+                                Style="{StaticResource CardStyle}">
+                            <Grid RowDefinitions="Auto,Auto" RowSpacing="10">
 
-                            <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+                                <Label Grid.Row="0"
+                                       Text="{Binding DisplayName}"
+                                       FontSize="16"
+                                       FontAttributes="Bold" />
 
-                                <HorizontalStackLayout Spacing="16" VerticalOptions="Center">
-                                    <VerticalStackLayout Spacing="1">
-                                        <Label Text="{Binding EggsGiven, StringFormat='Given: {0}'}"
-                                               FontSize="12"
-                                               TextColor="Green" />
-                                        <Label Text="{Binding ValueGiven, StringFormat='+{0:F2} CZK'}"
-                                               FontSize="12"
-                                               FontAttributes="Bold"
-                                               TextColor="Green" />
-                                    </VerticalStackLayout>
-                                    <VerticalStackLayout Spacing="1">
-                                        <Label Text="{Binding EggsTaken, StringFormat='Taken: {0}'}"
-                                               FontSize="12"
-                                               TextColor="Red" />
-                                        <Label Text="{Binding ValueTaken, StringFormat='-{0:F2} CZK'}"
-                                               FontSize="12"
-                                               FontAttributes="Bold"
-                                               TextColor="Red" />
-                                    </VerticalStackLayout>
-                                    <VerticalStackLayout Spacing="1">
-                                        <Label Text="{Binding EggsExpired, StringFormat='Expired: {0}'}"
-                                               FontSize="12"
-                                               TextColor="Orange" />
-                                        <Label Text="{Binding ValueExpired, StringFormat='-{0:F2} CZK'}"
-                                               FontSize="12"
-                                               FontAttributes="Bold"
-                                               TextColor="Orange" />
-                                    </VerticalStackLayout>
-                                </HorizontalStackLayout>
+                                <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
 
-                                <Label Grid.Column="1"
-                                       Text="{Binding NetValue, StringFormat='{0:F2} CZK'}"
-                                       FontSize="20"
-                                       FontAttributes="Bold"
-                                       TextColor="{Binding NetValueColor}"
-                                       VerticalOptions="Center"
-                                       HorizontalOptions="End" />
+                                    <HorizontalStackLayout Spacing="16" VerticalOptions="Center">
+
+                                        <VerticalStackLayout Spacing="1">
+                                            <Label Text="{Binding EggsGiven, StringFormat='Given: {0}'}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource Success}" />
+                                            <Label Text="{Binding ValueGiven, StringFormat='+{0:F2} CZK'}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Success}" />
+                                        </VerticalStackLayout>
+
+                                        <VerticalStackLayout Spacing="1">
+                                            <Label Text="{Binding EggsTaken, StringFormat='Taken: {0}'}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource Danger}" />
+                                            <Label Text="{Binding ValueTaken, StringFormat='-{0:F2} CZK'}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Danger}" />
+                                        </VerticalStackLayout>
+
+                                        <VerticalStackLayout Spacing="1">
+                                            <Label Text="{Binding EggsExpired, StringFormat='Expired: {0}'}"
+                                                   FontSize="12"
+                                                   TextColor="{StaticResource Warning}" />
+                                            <Label Text="{Binding ValueExpired, StringFormat='-{0:F2} CZK'}"
+                                                   FontSize="12"
+                                                   FontAttributes="Bold"
+                                                   TextColor="{StaticResource Warning}" />
+                                        </VerticalStackLayout>
+
+                                    </HorizontalStackLayout>
+
+                                    <Label Grid.Column="1"
+                                           Text="{Binding NetValue, StringFormat='{0:F2} CZK'}"
+                                           FontSize="20"
+                                           FontAttributes="Bold"
+                                           TextColor="{Binding NetValueColor}"
+                                           VerticalOptions="Center"
+                                           HorizontalOptions="End" />
+
+                                </Grid>
 
                             </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
 
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+        </Grid>
 
         <Grid Grid.Row="0" Grid.RowSpan="3"
               IsVisible="{Binding IsDebtsVisible}"
               BackgroundColor="#B0000000">
 
-            <Border Padding="20"
-                    Margin="16"
-                    StrokeShape="RoundRectangle 12"
+            <Border Padding="24"
+                    Margin="20"
+                    Style="{StaticResource CardStyle}"
                     VerticalOptions="Center"
                     HorizontalOptions="Fill">
-                <VerticalStackLayout Spacing="12">
+                <VerticalStackLayout Spacing="14">
 
                     <Label Text="Debt Settlement"
                            FontSize="20"
                            FontAttributes="Bold"
                            HorizontalOptions="Center" />
 
-                    <Label Text="Everyone is settled up!"
-                           FontSize="15"
-                           TextColor="Green"
-                           HorizontalOptions="Center"
-                           IsVisible="{Binding HasNoDebts}" />
+                    <BoxView HeightRequest="1"
+                             BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
+                    <Border StrokeShape="RoundRectangle 8"
+                            Stroke="{StaticResource Success}"
+                            BackgroundColor="Transparent"
+                            Padding="12,10"
+                            IsVisible="{Binding HasNoDebts}">
+                        <Label Text="✓  Everyone is settled up!"
+                               FontSize="15"
+                               TextColor="{StaticResource Success}"
+                               HorizontalOptions="Center" />
+                    </Border>
 
                     <CollectionView ItemsSource="{Binding Debts}"
-                                    IsVisible="{Binding HasDebts}">
+                                    IsVisible="{Binding HasDebts}"
+                                    MaximumHeightRequest="300">
                         <CollectionView.ItemTemplate>
                             <DataTemplate>
                                 <Grid ColumnDefinitions="*,Auto" Padding="0,6">
@@ -131,20 +147,25 @@
                                            Text="{Binding AmountLabel}"
                                            FontSize="14"
                                            FontAttributes="Bold"
-                                           TextColor="Red"
+                                           TextColor="{StaticResource Danger}"
                                            VerticalOptions="Center" />
                                 </Grid>
                             </DataTemplate>
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
+                    <BoxView HeightRequest="1"
+                             BackgroundColor="{AppThemeBinding Light={StaticResource BorderLight}, Dark={StaticResource BorderDark}}" />
+
                     <Button Text="Mark as Settled &amp; Clear History"
-                            BackgroundColor="DarkRed"
-                            TextColor="White"
+                            Style="{StaticResource DangerButtonStyle}"
+                            HorizontalOptions="Center"
                             Command="{Binding SettleDebtsCommand}"
                             IsVisible="{Binding IsOwner}" />
 
                     <Button Text="Close"
+                            Style="{StaticResource OutlineButtonStyle}"
+                            HorizontalOptions="Center"
                             Command="{Binding CloseDebtsCommand}" />
 
                 </VerticalStackLayout>

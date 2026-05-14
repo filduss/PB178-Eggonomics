@@ -4,17 +4,17 @@ namespace Eggonomics
 {
     public partial class App : Application
     {
-        private readonly LoginPage _loginPage;
+        private readonly IServiceProvider _serviceProvider;
 
-        public App(LoginPage loginPage)
+        public App(IServiceProvider serviceProvider)
         {
             InitializeComponent();
-            _loginPage = loginPage;
+            _serviceProvider = serviceProvider;
         }
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(_loginPage);
+            return new Window(_serviceProvider.GetRequiredService<LoginPage>());
         }
     }
 }

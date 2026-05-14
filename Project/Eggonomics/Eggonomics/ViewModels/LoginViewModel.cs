@@ -14,6 +14,7 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty] public partial string? Email { get; set; }
     [ObservableProperty] public partial string? Password { get; set; }
     [ObservableProperty] public partial bool IsSignUpVisible { get; set; }
+    [ObservableProperty] public partial string? SignUpDisplayName { get; set; }
     [ObservableProperty] public partial string? SignUpEmail { get; set; }
     [ObservableProperty] public partial string? SignUpPassword { get; set; }
     [ObservableProperty] public partial string? ConfirmPassword { get; set; }
@@ -41,6 +42,11 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     public async Task PerformLogin()
     {
+        if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password))
+        {
+            return;
+        }
+
         bool isSuccess = await _authService.LoginAsync(Email, Password);
         if (isSuccess)
         {
@@ -56,6 +62,13 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     public async Task PerformRegister()
     {
+        if (string.IsNullOrWhiteSpace(SignUpDisplayName))
+        {
+            SignUpError = "Display name is required.";
+            HasSignUpError = true;
+            return;
+        }
+
         if (SignUpPassword?.Length < 8)
         {
             SignUpError = "Password must be at least 8 characters.";
@@ -78,9 +91,10 @@ public partial class LoginViewModel : ObservableObject
             return;
         }
 
-        bool isSuccess = await _authService.CreateAccountAsync(SignUpEmail, SignUpPassword);
-        if (isSuccess)
+        string? error = await _authService.CreateAccountAsync(SignUpEmail, SignUpPassword, SignUpDisplayName);
+        if (error == null)
         {
+            SignUpDisplayName = string.Empty;
             SignUpEmail = string.Empty;
             SignUpPassword = string.Empty;
             ConfirmPassword = string.Empty;
@@ -88,7 +102,7 @@ public partial class LoginViewModel : ObservableObject
         }
         else
         {
-            SignUpError = "Registration failed. Try again.";
+            SignUpError = error;
             HasSignUpError = true;
         }
     }

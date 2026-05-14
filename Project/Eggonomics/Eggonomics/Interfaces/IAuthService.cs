@@ -7,7 +7,7 @@ namespace Eggonomics.Interfaces
     public interface IAuthService
     {
         Task<bool> LoginAsync(string email, string password);
-        Task<bool> CreateAccountAsync(string email, string password);
+        Task<string?> CreateAccountAsync(string email, string password, string displayName);
         Task SignOutAsync();
     }
 }
