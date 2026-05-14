@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Eggonomics.Models
 {
     public class DebtSettlement
@@ -11,6 +13,7 @@ namespace Eggonomics.Models
         public User Receiver { get; set; } = null!;
         public decimal Amount { get; set; }
         public DateTime SettledAt { get; set; }
+        [MaxLength(500)]
         public string? Notes { get; set; }
 
         public DebtSettlement() { }

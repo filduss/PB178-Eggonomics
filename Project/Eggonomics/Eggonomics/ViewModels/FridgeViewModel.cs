@@ -1,11 +1,10 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Eggonomics.Enums;
 using Eggonomics.Interfaces;
 using Eggonomics.Models;
 using Eggonomics.Views;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace Eggonomics.ViewModels;
 
@@ -17,35 +16,26 @@ public partial class FridgeViewModel : ObservableObject
 
     private Fridge? _fridge;
 
-    [ObservableProperty]
-    private string fridgeName;
-
-    [ObservableProperty]
-    private bool isTraySelectVisible = false;
-
-    [ObservableProperty] private string name;
-    [ObservableProperty] private decimal price;
-    [ObservableProperty] private string notes;
-    [ObservableProperty] private Suppliers origin;
-    [ObservableProperty] private int quantityAdded;
-    [ObservableProperty] private DateTime expirationDate = DateTime.Today;
+    [ObservableProperty] public partial string? FridgeName { get; set; }
+    [ObservableProperty] public partial bool IsTraySelectVisible { get; set; }
+    [ObservableProperty] public partial string? Name { get; set; }
+    [ObservableProperty] public partial decimal Price { get; set; }
+    [ObservableProperty] public partial string? Notes { get; set; }
+    [ObservableProperty] public partial Suppliers Origin { get; set; }
+    [ObservableProperty] public partial int QuantityAdded { get; set; }
+    [ObservableProperty] public partial DateTime ExpirationDate { get; set; }
+    [ObservableProperty] public partial bool HasError { get; set; }
+    [ObservableProperty] public partial string? ErrorMessage { get; set; }
+    [ObservableProperty] public partial bool IsTakeEggsVisible { get; set; }
+    [ObservableProperty] public partial int TakeQuantity { get; set; }
+    [ObservableProperty] public partial bool HasTakeError { get; set; }
+    [ObservableProperty] public partial string? TakeErrorMessage { get; set; }
 
     public List<Suppliers> Origins { get; } = Enum.GetValues<Suppliers>().ToList();
     public ObservableCollection<EggTray> EggTrays { get; } = new();
     public ObservableCollection<EggOperation> Operations { get; } = new();
 
-    public int TotalEggs
-    {
-        get { return EggTrays.Sum(t => t.QuantityRemaining); }
-    }
-
-    [ObservableProperty] private bool hasError = false;
-    [ObservableProperty] private string errorMessage;
-
-    [ObservableProperty] private bool isTakeEggsVisible = false;
-    [ObservableProperty] private int takeQuantity;
-    [ObservableProperty] private bool hasTakeError = false;
-    [ObservableProperty] private string takeErrorMessage;
+    public int TotalEggs => EggTrays.Sum(t => t.QuantityRemaining);
 
     public FridgeViewModel(IServiceProvider serviceProvider, IEggTrayService eggTrayService, IFridgeOperationService fridgeOperationService)
     {
@@ -53,6 +43,7 @@ public partial class FridgeViewModel : ObservableObject
         _eggTrayService = eggTrayService;
         _fridgeOperationService = fridgeOperationService;
 
+        ExpirationDate = DateTime.Today;
         EggTrays.CollectionChanged += (_, _) => OnPropertyChanged(nameof(TotalEggs));
     }
 
@@ -116,7 +107,7 @@ public partial class FridgeViewModel : ObservableObject
         HasError = false;
         ErrorMessage = null;
 
-        int qty = QuantityAdded;
+        var qty = QuantityAdded;
 
         var tray = await _eggTrayService.InsertAsync(
             name: Name,

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Eggonomics.Enums;
 
@@ -9,8 +10,9 @@ namespace Eggonomics.Models
         public int QuantityAdded { get; set; }
 
         [ObservableProperty]
-        private int quantityRemaining;
+        public partial int QuantityRemaining { get; set; }
 
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
         public Suppliers Origin { get; set; }
         public DateOnly ExpirationDate { get; set; }
@@ -21,6 +23,8 @@ namespace Eggonomics.Models
         public int AddedByUserId { get; set; }
         public User AddedBy { get; set; } = null!;
         public DateTime AddedAt { get; set; }
+
+        [MaxLength(500)]
         public string? Notes { get; set; }
 
         public EggTray() { }

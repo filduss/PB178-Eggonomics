@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Eggonomics.Data;
@@ -6,7 +5,7 @@ using Eggonomics.Interfaces;
 using Eggonomics.Models;
 using Eggonomics.Views;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace Eggonomics.ViewModels;
 
@@ -18,25 +17,14 @@ public partial class FridgeOverviewViewModel : ObservableObject
     private readonly Supabase.Client _supabaseClient;
 
     private Fridge? _fridge;
-    private bool _sortAscending = false;
+    private bool _sortAscending;
 
-    [ObservableProperty]
-    private string fridgeName = string.Empty;
-
-    [ObservableProperty]
-    private string sortLabel = "↓ Net Value";
-
-    [ObservableProperty]
-    private bool isDebtsVisible = false;
-
-    [ObservableProperty]
-    private bool isOwner = false;
-
-    [ObservableProperty]
-    private bool hasDebts = false;
-
-    [ObservableProperty]
-    private bool hasNoDebts = true;
+    [ObservableProperty] public partial string FridgeName { get; set; }
+    [ObservableProperty] public partial string SortLabel { get; set; }
+    [ObservableProperty] public partial bool IsDebtsVisible { get; set; }
+    [ObservableProperty] public partial bool IsOwner { get; set; }
+    [ObservableProperty] public partial bool HasDebts { get; set; }
+    [ObservableProperty] public partial bool HasNoDebts { get; set; }
 
     public ObservableCollection<UserFridgeStats> Members { get; } = new();
     public ObservableCollection<DebtResult> Debts { get; } = new();
@@ -51,6 +39,10 @@ public partial class FridgeOverviewViewModel : ObservableObject
         _fridgeOperationService = fridgeOperationService;
         _db = db;
         _supabaseClient = supabaseClient;
+
+        FridgeName = string.Empty;
+        SortLabel = "↓ Net Value";
+        HasNoDebts = true;
     }
 
     public async Task Initialize(Fridge fridge)
@@ -122,7 +114,7 @@ public partial class FridgeOverviewViewModel : ObservableObject
         }
 
         bool confirmed = await Application.Current!.Windows[0].Page!
-            .DisplayAlert("Settle Debts", "This will permanently delete all operation history for this fridge. Continue?", "Yes, settle", "Cancel");
+            .DisplayAlertAsync("Settle Debts", "This will permanently delete all operation history for this fridge. Continue?", "Yes, settle", "Cancel");
 
         if (!confirmed)
         {

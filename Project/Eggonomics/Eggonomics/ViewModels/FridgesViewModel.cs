@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Eggonomics.Data;
@@ -6,7 +5,7 @@ using Eggonomics.Interfaces;
 using Eggonomics.Models;
 using Eggonomics.Views;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using System.Collections.ObjectModel;
 
 namespace Eggonomics.ViewModels;
 
@@ -20,29 +19,14 @@ public partial class FridgesViewModel : ObservableObject
     private User? _currentUser;
     private Fridge? _managingFridge;
 
-    [ObservableProperty]
-    private bool isCreateFridgeVisible = false;
-
-    [ObservableProperty]
-    private string newFridgeName;
-
-    [ObservableProperty]
-    private bool isViewMembersVisible = false;
-
-    [ObservableProperty]
-    private string selectedFridgeName;
-
-    [ObservableProperty]
-    private bool isManageVisible = false;
-
-    [ObservableProperty]
-    private string addMemberEmail;
-
-    [ObservableProperty]
-    private string manageError;
-
-    [ObservableProperty]
-    private bool hasManageError;
+    [ObservableProperty] public partial bool IsCreateFridgeVisible { get; set; }
+    [ObservableProperty] public partial string? NewFridgeName { get; set; }
+    [ObservableProperty] public partial bool IsViewMembersVisible { get; set; }
+    [ObservableProperty] public partial string? SelectedFridgeName { get; set; }
+    [ObservableProperty] public partial bool IsManageVisible { get; set; }
+    [ObservableProperty] public partial string? AddMemberEmail { get; set; }
+    [ObservableProperty] public partial string? ManageError { get; set; }
+    [ObservableProperty] public partial bool HasManageError { get; set; }
 
     public ObservableCollection<FridgeItem> Fridges { get; } = new();
     public ObservableCollection<User> FridgeMembers { get; } = new();
@@ -286,7 +270,6 @@ public partial class FridgesViewModel : ObservableObject
         {
             return;
         }
-
 
         _db.FridgeUsers.Remove(membership);
         await _db.SaveChangesAsync();

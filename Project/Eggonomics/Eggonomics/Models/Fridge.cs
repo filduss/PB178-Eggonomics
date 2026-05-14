@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Eggonomics.Models
 {
     public class Fridge
     {
         public int Id { get; set; }
+
+        [MaxLength(100)]
         public string Name { get; set; } = string.Empty;
         public int OwnerId { get; set; }
         public User Owner { get; set; } = null!;

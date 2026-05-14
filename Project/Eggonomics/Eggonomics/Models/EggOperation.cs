@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Eggonomics.Enums;
 
 namespace Eggonomics.Models
@@ -16,6 +17,7 @@ namespace Eggonomics.Models
         public DateTime? EditedAt { get; set; }
         public int? EditedByUserId { get; set; }
         public User? EditedBy { get; set; }
+        [MaxLength(500)]
         public string? Notes { get; set; }
 
         public string TypeLabel => Type switch
@@ -23,6 +25,7 @@ namespace Eggonomics.Models
             OperationType.Insert => "gave",
             OperationType.Withdraw => "took",
             OperationType.Expire => "expired",
+            _ => "unknown",
         };
 
         public List<EggOperationBatchLink> BatchLinks { get; set; } = [];

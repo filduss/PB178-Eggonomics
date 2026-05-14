@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Threading.Tasks;
 using Eggonomics.Interfaces;
 using Eggonomics.Views;
-using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics;
 
 namespace Eggonomics.ViewModels;
 
@@ -13,29 +11,14 @@ public partial class LoginViewModel : ObservableObject
     private readonly IAuthService _authService;
     private readonly IServiceProvider _serviceProvider;
 
-    [ObservableProperty]
-    private string email;
-
-    [ObservableProperty]
-    private string password;
-
-    [ObservableProperty]
-    private bool isSignUpVisible = false;
-
-    [ObservableProperty]
-    private string signUpEmail;
-
-    [ObservableProperty]
-    private string signUpPassword;
-
-    [ObservableProperty]
-    private string confirmPassword;
-
-    [ObservableProperty]
-    private string signUpError;
-
-    [ObservableProperty]
-    private bool hasSignUpError;
+    [ObservableProperty] public partial string? Email { get; set; }
+    [ObservableProperty] public partial string? Password { get; set; }
+    [ObservableProperty] public partial bool IsSignUpVisible { get; set; }
+    [ObservableProperty] public partial string? SignUpEmail { get; set; }
+    [ObservableProperty] public partial string? SignUpPassword { get; set; }
+    [ObservableProperty] public partial string? ConfirmPassword { get; set; }
+    [ObservableProperty] public partial string? SignUpError { get; set; }
+    [ObservableProperty] public partial bool HasSignUpError { get; set; }
 
     public LoginViewModel(IAuthService authService, IServiceProvider serviceProvider)
     {
@@ -58,7 +41,7 @@ public partial class LoginViewModel : ObservableObject
     [RelayCommand]
     public async Task PerformLogin()
     {
-        bool isSuccess = await _authService.LoginAsync(email, password);
+        bool isSuccess = await _authService.LoginAsync(Email, Password);
         if (isSuccess)
         {
             var fridgesPage = _serviceProvider.GetRequiredService<FridgesPage>();
@@ -89,6 +72,12 @@ public partial class LoginViewModel : ObservableObject
 
         SignUpError = null;
         HasSignUpError = false;
+        if (SignUpEmail == null || SignUpPassword == null)
+        {
+            SignUpError = "Required field missing.";
+            return;
+        }
+
         bool isSuccess = await _authService.CreateAccountAsync(SignUpEmail, SignUpPassword);
         if (isSuccess)
         {
